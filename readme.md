@@ -17,102 +17,102 @@ This is the official Pytorch implementation of paper <a href="https://arxiv.org/
 ## Installation
 
 - ### Install pytorch
-  ``` bash
-  pip install torch==1.12.0+cu113 torchvision==0.13.0+cu113 torchaudio==0.12.0 --extra-index-url https://download.pytorch.org/whl/cu113
-  ```
+``` bash
+pip install torch==1.12.0+cu113 torchvision==0.13.0+cu113 torchaudio==0.12.0 --extra-index-url https://download.pytorch.org/whl/cu113
+```
 
 
 - ### Install pytorch3d from a local clone
-  ``` bash
-  git clone https://github.com/facebookresearch/pytorch3d.git
-  cd pytorch3d
-  git checkout -f v0.7.2
-  pip install -e .
-  ```
+``` bash
+git clone https://github.com/facebookresearch/pytorch3d.git
+cd pytorch3d
+git checkout -f v0.7.2
+pip install -e .
+```
 
 - ### Install from requirements.txt
-  ``` bash
-  pip install -r requirements.txt 
-  ```
+``` bash
+pip install -r requirements.txt 
+```
 
 - ### Compile pointnet2
-  ``` bash
-  cd networks/pts_encoder/pointnet2_utils/pointnet2
-  python setup.py install
-  ```
+``` bash
+cd networks/pts_encoder/pointnet2_utils/pointnet2
+python setup.py install
+```
 
 ## Download dataset and models
 - Download camera_train, camera_val, real_train, real_test, ground-truth annotations and mesh models provided by <a href ="https://github.com/hughw19/NOCS_CVPR2019">NOCS</a>. Unzip and organize these files in $ROOT/data as follows:
-  ``` bash
-  data
-  ├── CAMERA
-  │   ├── train
-  │   └── val
-  ├── Real
-  │   ├── train
-  │   └── test
-  ├── gts
-  │   ├── val
-  │   └── real_test
-  └── obj_models
-      ├── train
-      ├── val
-      ├── real_train
-      └── real_test
-  ```
+``` bash
+data
+├── CAMERA
+│   ├── train
+│   └── val
+├── Real
+│   ├── train
+│   └── test
+├── gts
+│   ├── val
+│   └── real_test
+└── obj_models
+    ├── train
+    ├── val
+    ├── real_train
+    └── real_test
+```
 
 - Preprocess NOCS files following <a  href ="https://github.com/mentian/object-deformnet">SPD</a>. 
 
-  We provide the preprocessed testing data (REAL275) and checkpoints <a href="https://drive.google.com/file/d/1UrSVb7qYIOGWSB4z6W8IrBdRm-8M0Q-N/view?usp=sharing">here</a> for a quick evaluation. Download and organize the files in $ROOT/results as follows:
-  ``` bash
-  results
-  ├── ckpts
-  │   ├── EnergyNet
-  │   │   └── ckpt_genpose.pth
-  │   └── ScoreNet
-  │       └── ckpt_genpose.pth
-  ├── evaluation_results
-  │   ├── segmentation_logs_real_test.txt
-  │   └── segmentation_results_real_test.pkl
-  └── mrcnn_results
-      ├── real_test
-      └── val
-  ```
-  The *ckpts* is the trained models of GenPose.
+We provide the preprocessed testing data (REAL275) and checkpoints <a href="https://drive.google.com/file/d/1UrSVb7qYIOGWSB4z6W8IrBdRm-8M0Q-N/view?usp=sharing">here</a> for a quick evaluation. Download and organize the files in $ROOT/results as follows:
+``` bash
+results
+├── ckpts
+│   ├── EnergyNet
+│   │   └── ckpt_genpose.pth
+│   └── ScoreNet
+│       └── ckpt_genpose.pth
+├── evaluation_results
+│   ├── segmentation_logs_real_test.txt
+│   └── segmentation_results_real_test.pkl
+└── mrcnn_results
+    ├── real_test
+    └── val
+```
+The *ckpts* are the trained models of GenPose.
 
-  The *evaluation_results* is the preprocessed testing data, which contains the segmentation results of Mask R-CNN, the segmented pointclouds of obejcts, and the ground-truth poses. 
+The *evaluation_results* are the preprocessed testing data, which contains the segmentation results of Mask R-CNN, the segmented pointclouds of obejcts, and the ground-truth poses. 
   
-  The *mrcnn_results* is the segmentation results from <a href="https://drive.google.com/file/d/1p72NdY4Bie_sra9U8zoUNI4fTrQZdbnc/view">here</a> provided by <a href="https://github.com/mentian/object-deformnet">SPD</a>.
+The *mrcnn_results* are the segmentation results from <a href="https://drive.google.com/file/d/1p72NdY4Bie_sra9U8zoUNI4fTrQZdbnc/view">here</a> provided by <a href="https://github.com/mentian/object-deformnet">SPD</a>.
 
-  **Note**: If you want to evaluate on CAMERA dataset, you need to preprocess the data first.
+**Note**: You need to preprocess the dataset as mentioned before first if you want to evaluate on CAMERA dataset.
 
 ## Training
 Set the parameter '--data_path' in scripts/train_score.sh and scripts/train_energy.sh to your own path of NOCS dataset.
 
 - ### Score network
-  Train the score network to generate the pose candidates.
-  ``` bash
-  bash scripts/train_score.sh
-  ```
+Train the score network to generate the pose candidates.
+``` bash
+bash scripts/train_score.sh
+```
 - ### Energy network
-  Train the energy network to aggragate the pose candidates.
-  ``` bash
-  bash scripts/train_energy.sh
-  ```
+Train the energy network to aggragate the pose candidates.
+``` bash
+bash scripts/train_energy.sh
+```
 
 ## Evaluation
 Set the parameter *--data_path* in *scripts/eval_single.sh* to your own path of NOCS dataset.
 
 - ### Evaluate on REAL275 dataset.
-  Set the parameter *--test_source* in *scripts/eval_single.sh* to *'real_test'* and run:
-  ``` bash
-  bash scripts/eval_single.sh
-  ```
+Set the parameter *--test_source* in *scripts/eval_single.sh* to *'real_test'* andrun:
+``` bash
+bash scripts/eval_single.sh
+```
 - ### Evaluate on CAMERA dataset.
-  Set the parameter *--test_source* in *scripts/eval_single.sh* to *'val'* and run:
-  ``` bash
-  bash scripts_eval_pose_estimation.sh
-  ```
+Set the parameter *--test_source* in *scripts/eval_single.sh* to *'val'* and run:
+``` bash
+bash scripts_eval_pose_estimation.sh
+```
 
 ## Citation
 If you find our work useful in your research, please consider citing:
